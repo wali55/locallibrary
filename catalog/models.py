@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
+from datetime import date
 import uuid
 
 class Genre(models.Model):
@@ -61,9 +62,14 @@ class BookInstance(models.Model):
 
     class Meta:
         ordering = ['due_back']
+        permissions = (("can_mark_returned", "Set book as returned"),)
 
     def __str__(self):
         return f'{self.id} ({self.book.title})'
+    
+    @property
+    def is_overdue(self):
+        return bool(self.due_back and date.today() > self.due_back)
     
 
 class Author(models.Model):
