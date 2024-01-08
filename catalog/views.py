@@ -2,7 +2,7 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.views import generic
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import Book, BookInstance, Author, Genre
 
 def index(request):
@@ -50,5 +50,17 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
         return (
             BookInstance.objects.filter(borrower=self.request.user)
             .filter(status__exact='o')
+            .order_by('due_back')
+        )
+    
+class BorrowedBooksListView(PermissionRequiredMixin, generic.ListView):
+    permission_required = 'catalog.can_mark_returned'
+    model = BookInstance
+    template_name = 'catalog/borrowed_books.html'
+    paginate_by = 2
+
+    def get_queryset(self):
+        return (
+            BookInstance.objects.filter(status__exact='o')
             .order_by('due_back')
         )
