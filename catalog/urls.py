@@ -12,4 +12,5 @@ urlpatterns = [
     path('book/<uuid:pk>/renew/', views.renew_book_librarian, name='renew-book-librarian'),
 ]
 
-# new path added
+# new path added 
+# another new path added
